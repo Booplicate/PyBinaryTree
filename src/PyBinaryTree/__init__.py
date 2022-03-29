@@ -20,6 +20,7 @@ from typing import (
     TypeAlias,
     Callable,
     Any,
+    Literal,
     Protocol,
     Generic,
     cast as cast_type,
@@ -493,7 +494,7 @@ class BinaryTree(Generic[_T]):
             callback(node)
 
     @staticmethod
-    def cmp_hash(obj1: _Node[_T] | _T, obj2: _Node[_T] | _T) -> int:
+    def cmp_hash(obj1: _Node[_T] | _T, obj2: _Node[_T] | _T) -> Literal[-1, 0, 1]:
         """
         Compares hash of 2 objects, returns an int in range [-1, 1]
 
@@ -504,6 +505,12 @@ class BinaryTree(Generic[_T]):
         OUT:
             int
         """
-        h1 = hash(obj1)# pylint: disable=invalid-name
-        h2 = hash(obj2)# pylint: disable=invalid-name
-        return (h1 > h2) - (h1 < h2)
+        # pylint: disable=invalid-name
+        h1 = hash(obj1)
+        h2 = hash(obj2)
+        rv = (h1 > h2) - (h1 < h2)
+        # mypy I swear to got...
+        if TYPE_CHECKING:
+            rv = cast_type(Literal[-1, 0, 1], rv)
+        return rv
+        # pylint: enable=invalid-name
